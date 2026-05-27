@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gastos | MOTRIX</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            background: #111827;
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding: 25px 20px;
+        }
+
+        .sidebar h2 {
+            margin: 0 0 35px;
+            font-size: 26px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #d1d5db;
+            text-decoration: none;
+            margin: 15px 0;
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .sidebar a:hover,
+        .sidebar .active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .content {
+            margin-left: 240px;
+            padding: 30px;
+        }
+
+        .topbar,
+        .panel,
+        .card {
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .topbar {
+            padding: 22px 25px;
+            margin-bottom: 25px;
+        }
+
+        .topbar h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        .topbar p {
+            margin: 8px 0 0;
+            color: #6b7280;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            padding: 22px;
+        }
+
+        .card h3 {
+            margin: 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .number {
+            margin-top: 10px;
+            font-size: 27px;
+            font-weight: bold;
+        }
+
+        .red {
+            border-left: 6px solid #dc2626;
+        }
+
+        .blue {
+            border-left: 6px solid #2563eb;
+        }
+
+        .panel {
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: #4b5563;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 45px;
+            resize: vertical;
+        }
+
+        .btn {
+            border: none;
+            padding: 12px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #dc2626;
+            color: white;
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .search-box {
+            max-width: 320px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #111827;
+            color: white;
+        }
+
+        th, td {
+            padding: 14px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .money {
+            font-weight: bold;
+            color: #dc2626;
+        }
+
+        .badge {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-weight: bold;
+            font-size: 12px;
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .note {
+            background: #f9fafb;
+            border-left: 5px solid #2563eb;
+            padding: 14px;
+            border-radius: 10px;
+            color: #4b5563;
+            margin-bottom: 18px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 1100px) {
+            .cards,
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 750px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .content {
+                margin-left: 0;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>MOTRIX</h2>
+
+        <a href="/">Dashboard</a>
+        <a href="/inventario">Inventario</a>
+        <a href="/ventas">Ventas</a>
+        <a class="active" href="/gastos">Gastos</a>
+
+        {% if session.get('rol') == 'admin' %}
+            <a href="/informes">Informes</a>
+            <a href="/usuarios">Usuarios</a>
+        {% endif %}
+
+        <a href="/logout">Cerrar sesión</a>
+    </div>
+
+    <div class="content">
+
+        <div class="topbar">
+            <h1>Gastos del día</h1>
+            <p>Registra gastos operativos. Estos valores serán descontados en los informes administrativos.</p>
+        </div>
+
+        <div class="cards">
+            <div class="card red">
+                <h3>Total gastos registrados</h3>
+                <div class="number">$ {{ "{:,.0f}".format(total_gastos or 0) }}</div>
+            </div>
+
+            <div class="card blue">
+                <h3>Cantidad de registros</h3>
+                <div class="number">{{ gastos | length }}</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Registrar gasto</h2>
+
+            <div class="note">
+                Los vendedores pueden registrar gastos. El administrador podrá verlos en informes y se descontarán de la ganancia final según los filtros de fecha y vendedor.
+            </div>
+
+            <form action="/registrar_gasto" method="POST">
+                <div class="form-grid">
+
+                    <div>
+                        <label>Descripción del gasto</label>
+                        <textarea name="descripcion" placeholder="Ej: Transporte, bolsas, papelería, domicilio, alimentación" required></textarea>
+                    </div>
+
+                    <div>
+                        <label>Valor</label>
+                        <input type="number" name="valor" min="1" placeholder="Ej: 15000" required>
+                    </div>
+
+                    <div>
+                        <label>Fecha y hora</label>
+                        <input type="datetime-local" name="fecha_gasto" required>
+                    </div>
+
+                    <div>
+                        <button class="btn btn-primary" type="submit">Registrar gasto</button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+
+        <div class="panel">
+            <div class="table-header">
+                <div>
+                    <h2>Historial de gastos</h2>
+                    <p style="margin: 0; color: #6b7280;">
+                        {% if session.get('rol') == 'admin' %}
+                            Vista administrativa: todos los gastos registrados.
+                        {% else %}
+                            Vista de tus gastos registrados.
+                        {% endif %}
+                    </p>
+                </div>
+
+                <input class="search-box" type="text" id="buscador" placeholder="Buscar gasto..." onkeyup="buscarGasto()">
+            </div>
+
+            <table id="tablaGastos">
+                <thead>
+                    <tr>
+                        <th>Fecha y hora</th>
+                        <th>Descripción</th>
+                        <th>Valor</th>
+                        <th>Registrado por</th>
+
+                        {% if session.get('rol') == 'admin' %}
+                            <th>Acciones</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for gasto in gastos %}
+                    <tr>
+                        <td>{{ gasto.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td><strong>{{ gasto.descripcion }}</strong></td>
+                        <td class="money">$ {{ "{:,.0f}".format(gasto.valor or 0) }}</td>
+                        <td><span class="badge">{{ gasto.registrado_por }}</span></td>
+
+                        {% if session.get('rol') == 'admin' %}
+                            <td>
+                                <a class="btn btn-delete"
+                                   href="/eliminar_gasto/{{ gasto.id }}"
+                                   onclick="return confirm('¿Seguro que deseas eliminar este gasto?')">
+                                   Eliminar
+                                </a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5">Todavía no hay gastos registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        function buscarGasto() {
+            let input = document.getElementById("buscador");
+            let filtro = input.value.toLowerCase();
+            let tabla = document.getElementById("tablaGastos");
+            let filas = tabla.getElementsByTagName("tr");
+
+            for (let i = 1; i < filas.length; i++) {
+                let textoFila = filas[i].textContent.toLowerCase();
+
+                if (textoFila.includes(filtro)) {
+                    filas[i].style.display = "";
+                } else {
+                    filas[i].style.display = "none";
+                }
+            }
+        }
+
+        window.addEventListener('load', function () {
+            const fechaInput = document.querySelector('input[name="fecha_gasto"]');
+
+            if (fechaInput && !fechaInput.value) {
+                const ahora = new Date();
+                ahora.setMinutes(ahora.getMinutes() - ahora.getTimezoneOffset());
+                fechaInput.value = ahora.toISOString().slice(0, 16);
+            }
+        });
+    </script>
+
+</body>
+</html>
