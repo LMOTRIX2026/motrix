@@ -1,0 +1,458 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inventario | MOTRIX</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            background: #111827;
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding: 25px 20px;
+        }
+
+        .sidebar h2 {
+            margin: 0 0 35px;
+            font-size: 26px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #d1d5db;
+            text-decoration: none;
+            margin: 15px 0;
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .sidebar a:hover,
+        .sidebar .active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .content {
+            margin-left: 240px;
+            padding: 30px;
+        }
+
+        .topbar,
+        .panel,
+        .card {
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .topbar {
+            padding: 22px 25px;
+            margin-bottom: 25px;
+        }
+
+        .topbar h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        .topbar p {
+            margin: 8px 0 0;
+            color: #6b7280;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            padding: 22px;
+        }
+
+        .card h3 {
+            margin: 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .number {
+            margin-top: 10px;
+            font-size: 27px;
+            font-weight: bold;
+        }
+
+        .blue {
+            border-left: 6px solid #2563eb;
+        }
+
+        .green {
+            border-left: 6px solid #16a34a;
+        }
+
+        .orange {
+            border-left: 6px solid #f97316;
+        }
+
+        .panel {
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: #4b5563;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .btn {
+            border: none;
+            padding: 12px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+            margin-top: 18px;
+        }
+
+        .btn-edit {
+            background: #f59e0b;
+            color: white;
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        .btn-delete {
+            background: #dc2626;
+            color: white;
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .search-box {
+            max-width: 320px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #111827;
+            color: white;
+        }
+
+        th, td {
+            padding: 14px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .money {
+            font-weight: bold;
+        }
+
+        .badge {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-weight: bold;
+            font-size: 12px;
+            display: inline-block;
+        }
+
+        .stock-ok {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .stock-bajo {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        @media (max-width: 1000px) {
+            .cards,
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 750px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .content {
+                margin-left: 0;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>MOTRIX</h2>
+
+        <a href="/">Dashboard</a>
+        <a class="active" href="/inventario">Inventario</a>
+        <a href="/ventas">Ventas</a>
+
+        {% if session.get('rol') == 'admin' %}
+            <a href="/informes">Informes</a>
+            <a href="/usuarios">Usuarios</a>
+        {% endif %}
+
+        <a href="/logout">Cerrar sesión</a>
+    </div>
+
+    <div class="content">
+
+        <div class="topbar">
+            <h1>Inventario</h1>
+            <p>Consulta y control de productos disponibles.</p>
+        </div>
+
+        {% if session.get('rol') == 'admin' %}
+
+        <div class="cards">
+
+            <div class="card blue">
+                <h3>Valor inventario a costo</h3>
+                <div class="number">$ {{ "{:,.0f}".format(total_inventario_costo) }}</div>
+            </div>
+
+            <div class="card green">
+                <h3>Valor inventario a venta</h3>
+                <div class="number">$ {{ "{:,.0f}".format(total_inventario_venta) }}</div>
+            </div>
+
+            <div class="card orange">
+                <h3>Utilidad proyectada</h3>
+                <div class="number">$ {{ "{:,.0f}".format(utilidad_proyectada) }}</div>
+            </div>
+
+        </div>
+
+        <div class="panel">
+            <h2>Agregar producto</h2>
+
+            <form action="/agregar_producto" method="POST">
+
+                <div class="form-grid">
+
+                    <div>
+                        <label>Referencia</label>
+                        <input type="text" name="referencia" required>
+                    </div>
+
+                    <div>
+                        <label>Nombre</label>
+                        <input type="text" name="nombre" required>
+                    </div>
+
+                    <div>
+                        <label>Marca</label>
+                        <input type="text" name="marca" required>
+                    </div>
+
+                    <div>
+                        <label>Categoría</label>
+                        <input type="text" name="categoria" required>
+                    </div>
+
+                    <div>
+                        <label>Stock</label>
+                        <input type="number" name="stock" min="0" required>
+                    </div>
+
+                    <div>
+                        <label>Precio compra</label>
+                        <input type="number" name="precio_compra" min="0" required>
+                    </div>
+
+                    <div>
+                        <label>Precio venta sugerido</label>
+                        <input type="number" name="precio_venta" min="0" required>
+                    </div>
+
+                </div>
+
+                <button class="btn btn-primary" type="submit">Guardar producto</button>
+
+            </form>
+        </div>
+
+        {% endif %}
+
+        <div class="panel">
+
+            <div class="table-header">
+                <div>
+                    <h2>Productos registrados</h2>
+                    <p style="margin: 0; color: #6b7280;">Los vendedores no visualizan precios de costo ni ganancias.</p>
+                </div>
+
+                <input class="search-box" type="text" id="buscador" placeholder="Buscar producto..." onkeyup="buscarProducto()">
+            </div>
+
+            <table id="tablaProductos">
+                <thead>
+                    <tr>
+                        <th>Referencia</th>
+                        <th>Producto</th>
+                        <th>Marca</th>
+                        <th>Categoría</th>
+                        <th>Stock</th>
+
+                        {% if session.get('rol') == 'admin' %}
+                            <th>Compra</th>
+                        {% endif %}
+
+                        <th>Venta sugerida</th>
+
+                        {% if session.get('rol') == 'admin' %}
+                            <th>Ganancia unidad</th>
+                            <th>Acciones</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for producto in productos %}
+                    <tr>
+                        <td>{{ producto.referencia }}</td>
+                        <td><strong>{{ producto.nombre }}</strong></td>
+                        <td>{{ producto.marca }}</td>
+                        <td>{{ producto.categoria }}</td>
+
+                        <td>
+                            {% if producto.stock <= 5 %}
+                                <span class="badge stock-bajo">Bajo: {{ producto.stock }}</span>
+                            {% else %}
+                                <span class="badge stock-ok">Disponible: {{ producto.stock }}</span>
+                            {% endif %}
+                        </td>
+
+                        {% if session.get('rol') == 'admin' %}
+                            <td class="money">$ {{ "{:,.0f}".format(producto.precio_compra or 0) }}</td>
+                        {% endif %}
+
+                        <td class="money">$ {{ "{:,.0f}".format(producto.precio_venta or 0) }}</td>
+
+                        {% if session.get('rol') == 'admin' %}
+                            <td class="money">$ {{ "{:,.0f}".format((producto.precio_venta or 0) - (producto.precio_compra or 0)) }}</td>
+
+                            <td>
+                                <a class="btn btn-edit" href="/editar_producto/{{ producto.id }}">Editar</a>
+
+                                <a class="btn btn-delete"
+                                   href="/eliminar_producto/{{ producto.id }}"
+                                   onclick="return confirm('¿Seguro que deseas eliminar este producto?')">
+                                   Eliminar
+                                </a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="9">Todavía no hay productos registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+
+    <script>
+        function buscarProducto() {
+            let input = document.getElementById("buscador");
+            let filtro = input.value.toLowerCase();
+            let tabla = document.getElementById("tablaProductos");
+            let filas = tabla.getElementsByTagName("tr");
+
+            for (let i = 1; i < filas.length; i++) {
+                let textoFila = filas[i].textContent.toLowerCase();
+
+                if (textoFila.includes(filtro)) {
+                    filas[i].style.display = "";
+                } else {
+                    filas[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+
+</body>
+</html>

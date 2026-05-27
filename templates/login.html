@@ -1,0 +1,125 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | MOTRIX</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #111827, #1d4ed8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #111827;
+        }
+
+        .login-card {
+            width: 380px;
+            background: white;
+            padding: 35px;
+            border-radius: 22px;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.25);
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 34px;
+            color: #111827;
+            letter-spacing: 1px;
+        }
+
+        .brand p {
+            margin: 8px 0 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            color: #4b5563;
+            margin-bottom: 6px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            outline: none;
+            font-size: 14px;
+            margin-bottom: 18px;
+        }
+
+        input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .footer {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 13px;
+            color: #6b7280;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-card">
+
+        <div class="brand">
+            <h1>MOTRIX</h1>
+            <p>Sistema de inventarios y ventas</p>
+        </div>
+
+        <form action="/login" method="POST">
+
+            <label>Usuario</label>
+            <input type="text" name="usuario" placeholder="Ingrese su usuario" required>
+
+            <label>Contraseña</label>
+            <input type="password" name="password" placeholder="Ingrese su contraseña" required>
+
+            <button type="submit">Ingresar</button>
+
+        </form>
+
+        <div class="footer">
+            Acceso administrativo inicial: admin / Admin2026
+        </div>
+
+    </div>
+
+</body>
+</html>

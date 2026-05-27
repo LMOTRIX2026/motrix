@@ -1,0 +1,496 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Informes | MOTRIX</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            background: #111827;
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding: 25px 20px;
+        }
+
+        .sidebar h2 {
+            margin: 0 0 35px;
+            font-size: 26px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #d1d5db;
+            text-decoration: none;
+            margin: 15px 0;
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .sidebar a:hover,
+        .sidebar .active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .content {
+            margin-left: 240px;
+            padding: 30px;
+        }
+
+        .topbar,
+        .panel,
+        .card {
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .topbar {
+            padding: 22px 25px;
+            margin-bottom: 25px;
+        }
+
+        .topbar h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        .topbar p {
+            margin: 8px 0 0;
+            color: #6b7280;
+        }
+
+        .panel {
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            align-items: end;
+        }
+
+        .cost-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 15px;
+            margin-top: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: #4b5563;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .btn {
+            border: none;
+            padding: 12px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-excel {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-clear {
+            background: #6b7280;
+            color: white;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            padding: 22px;
+        }
+
+        .card h3 {
+            margin: 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .number {
+            margin-top: 10px;
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .blue {
+            border-left: 6px solid #2563eb;
+        }
+
+        .green {
+            border-left: 6px solid #16a34a;
+        }
+
+        .orange {
+            border-left: 6px solid #f97316;
+        }
+
+        .red {
+            border-left: 6px solid #dc2626;
+        }
+
+        .purple {
+            border-left: 6px solid #7c3aed;
+        }
+
+        .dark {
+            border-left: 6px solid #111827;
+        }
+
+        .note {
+            background: #f9fafb;
+            border-left: 5px solid #2563eb;
+            padding: 14px;
+            border-radius: 10px;
+            color: #4b5563;
+            margin-bottom: 18px;
+            line-height: 1.6;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #111827;
+            color: white;
+        }
+
+        th, td {
+            padding: 14px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .money {
+            font-weight: bold;
+        }
+
+        .gain {
+            color: #15803d;
+            font-weight: bold;
+        }
+
+        .discount {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .final {
+            color: #7c3aed;
+            font-weight: bold;
+        }
+
+        .badge {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-weight: bold;
+            font-size: 12px;
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            text-transform: capitalize;
+        }
+
+        @media (max-width: 1100px) {
+            .filter-grid,
+            .cost-grid,
+            .cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 750px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .content {
+                margin-left: 0;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>MOTRIX</h2>
+
+        <a href="/">Dashboard</a>
+        <a href="/inventario">Inventario</a>
+        <a href="/ventas">Ventas</a>
+        <a class="active" href="/informes">Informes</a>
+        <a href="/usuarios">Usuarios</a>
+        <a href="/logout">Cerrar sesión</a>
+    </div>
+
+    <div class="content">
+
+        <div class="topbar">
+            <h1>Informes de ventas</h1>
+            <p>Filtra ventas, registra costos fijos, calcula promedio diario y genera proyecciones.</p>
+        </div>
+
+        <div class="panel">
+            <h2>Filtros, costos y proyección</h2>
+
+            <div class="note">
+                El descuento de <strong>datáfono</strong> y <strong>transferencia</strong> se calcula sobre el valor total pagado por el cliente, no sobre la ganancia. El costo fijo se descuenta después para obtener la ganancia final.
+            </div>
+
+            <form action="/informes" method="GET">
+
+                <div class="filter-grid">
+
+                    <div>
+                        <label>Vendedor</label>
+                        <select name="vendedor">
+                            <option value="">Todos</option>
+
+                            {% for item in vendedores %}
+                                <option value="{{ item[0] }}" {% if vendedor == item[0] %}selected{% endif %}>
+                                    {{ item[0] }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Producto</label>
+                        <select name="producto">
+                            <option value="">Todos</option>
+
+                            {% for item in productos %}
+                                <option value="{{ item[0] }}" {% if producto == item[0] %}selected{% endif %}>
+                                    {{ item[0] }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Fecha inicial</label>
+                        <input type="date" name="fecha_inicio" value="{{ fecha_inicio }}">
+                    </div>
+
+                    <div>
+                        <label>Fecha final</label>
+                        <input type="date" name="fecha_fin" value="{{ fecha_fin }}">
+                    </div>
+
+                </div>
+
+                <div class="cost-grid">
+
+                    <div>
+                        <label>Nombre del costo fijo</label>
+                        <input type="text" name="costo_fijo_nombre" value="{{ costo_fijo_nombre }}" placeholder="Ej: Día de empleado, arriendo, transporte">
+                    </div>
+
+                    <div>
+                        <label>Valor del costo fijo</label>
+                        <input type="number" name="costo_fijo_valor" value="{{ costo_fijo_valor }}" min="0" placeholder="Ej: 50000">
+                    </div>
+
+                    <div>
+                        <label>Días para proyección</label>
+                        <input type="number" name="dias_proyeccion" value="{{ dias_proyeccion }}" min="1" placeholder="Ej: 30">
+                    </div>
+
+                </div>
+
+                <br>
+                <button class="btn btn-primary" type="submit">Generar informe</button>
+
+                <a class="btn btn-clear" href="/informes">Limpiar filtros</a>
+
+                <a class="btn btn-excel"
+                   href="/descargar_informe_excel?vendedor={{ vendedor }}&producto={{ producto }}&fecha_inicio={{ fecha_inicio }}&fecha_fin={{ fecha_fin }}&costo_fijo_nombre={{ costo_fijo_nombre }}&costo_fijo_valor={{ costo_fijo_valor }}&dias_proyeccion={{ dias_proyeccion }}">
+                   Descargar Excel
+                </a>
+
+            </form>
+        </div>
+
+        <div class="cards">
+
+            <div class="card blue">
+                <h3>Cantidad vendida</h3>
+                <div class="number">{{ total_cantidad }}</div>
+            </div>
+
+            <div class="card green">
+                <h3>Total vendido</h3>
+                <div class="number">$ {{ "{:,.0f}".format(total_vendido or 0) }}</div>
+            </div>
+
+            <div class="card orange">
+                <h3>Ganancia bruta</h3>
+                <div class="number">$ {{ "{:,.0f}".format(total_ganancia_bruta or 0) }}</div>
+            </div>
+
+            <div class="card red">
+                <h3>Descuento por pago</h3>
+                <div class="number">$ {{ "{:,.0f}".format(total_descuento_pago or 0) }}</div>
+            </div>
+
+            <div class="card red">
+                <h3>Costo fijo registrado</h3>
+                <div class="number">$ {{ "{:,.0f}".format(costo_fijo_valor or 0) }}</div>
+            </div>
+
+            <div class="card purple">
+                <h3>Ganancia final</h3>
+                <div class="number">$ {{ "{:,.0f}".format(ganancia_final or 0) }}</div>
+            </div>
+
+        </div>
+
+        <div class="cards">
+
+            <div class="card dark">
+                <h3>Días con ventas</h3>
+                <div class="number">{{ dias_con_ventas }}</div>
+            </div>
+
+            <div class="card blue">
+                <h3>Promedio diario de ventas</h3>
+                <div class="number">$ {{ "{:,.0f}".format(promedio_dia_venta or 0) }}</div>
+            </div>
+
+            <div class="card green">
+                <h3>Promedio diario de ganancia</h3>
+                <div class="number">$ {{ "{:,.0f}".format(promedio_dia_ganancia or 0) }}</div>
+            </div>
+
+            <div class="card orange">
+                <h3>Proyección ventas</h3>
+                <div class="number">$ {{ "{:,.0f}".format(proyeccion_ventas or 0) }}</div>
+            </div>
+
+            <div class="card purple">
+                <h3>Proyección ganancia</h3>
+                <div class="number">$ {{ "{:,.0f}".format(proyeccion_ganancia or 0) }}</div>
+            </div>
+
+            <div class="card dark">
+                <h3>Días proyectados</h3>
+                <div class="number">{{ dias_proyeccion }}</div>
+            </div>
+
+        </div>
+
+        <div class="panel">
+            <h2>Resultados de la consulta</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha y hora</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio costo</th>
+                        <th>Precio venta</th>
+                        <th>Total</th>
+                        <th>Ganancia bruta</th>
+                        <th>Método pago</th>
+                        <th>% desc.</th>
+                        <th>Descuento</th>
+                        <th>Ganancia neta</th>
+                        <th>Vendedor</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for venta in ventas %}
+                    <tr>
+                        <td>{{ venta.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td><strong>{{ venta.producto }}</strong></td>
+                        <td>{{ venta.cantidad }}</td>
+                        <td class="money">$ {{ "{:,.0f}".format(venta.precio_costo or 0) }}</td>
+                        <td class="money">$ {{ "{:,.0f}".format(venta.precio_venta or 0) }}</td>
+                        <td class="money">$ {{ "{:,.0f}".format(venta.total or 0) }}</td>
+                        <td class="gain">$ {{ "{:,.0f}".format(venta.ganancia_bruta or 0) }}</td>
+                        <td><span class="badge">{{ venta.metodo_pago }}</span></td>
+                        <td>{{ venta.porcentaje_descuento_pago }}%</td>
+                        <td class="discount">$ {{ "{:,.0f}".format(venta.descuento_pago or 0) }}</td>
+                        <td class="final">$ {{ "{:,.0f}".format(venta.ganancia_neta or 0) }}</td>
+                        <td>{{ venta.vendedor }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="12">No hay resultados para los filtros seleccionados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

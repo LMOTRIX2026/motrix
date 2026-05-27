@@ -1,0 +1,271 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard | MOTRIX</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            background: #111827;
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding: 25px 20px;
+        }
+
+        .sidebar h2 {
+            margin: 0 0 35px;
+            font-size: 26px;
+            letter-spacing: 1px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #d1d5db;
+            text-decoration: none;
+            margin: 15px 0;
+            padding: 12px;
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover,
+        .sidebar .active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .content {
+            margin-left: 240px;
+            padding: 30px;
+        }
+
+        .topbar {
+            background: white;
+            padding: 22px 25px;
+            border-radius: 18px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .topbar h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        .topbar p {
+            margin: 8px 0 0;
+            color: #6b7280;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 22px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .card h3 {
+            margin: 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .number {
+            margin-top: 10px;
+            font-size: 27px;
+            font-weight: bold;
+        }
+
+        .blue {
+            border-left: 6px solid #2563eb;
+        }
+
+        .green {
+            border-left: 6px solid #16a34a;
+        }
+
+        .orange {
+            border-left: 6px solid #f97316;
+        }
+
+        .purple {
+            border-left: 6px solid #7c3aed;
+        }
+
+        .panel {
+            background: white;
+            padding: 25px;
+            border-radius: 18px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-top: 20px;
+        }
+
+        .action {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 20px;
+            border-radius: 15px;
+            text-decoration: none;
+            color: #111827;
+            transition: 0.3s;
+        }
+
+        .action:hover {
+            background: #2563eb;
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        @media (max-width: 1000px) {
+            .cards,
+            .actions {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 750px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>MOTRIX</h2>
+
+        <a class="active" href="/">Dashboard</a>
+        <a href="/inventario">Inventario</a>
+        <a href="/ventas">Ventas</a>
+
+        {% if session.get('rol') == 'admin' %}
+            <a href="/informes">Informes</a>
+            <a href="/usuarios">Usuarios</a>
+        {% endif %}
+
+        <a href="/logout">Cerrar sesión</a>
+    </div>
+
+    <div class="content">
+
+        <div class="topbar">
+            <h1>Panel principal</h1>
+            <p>Bienvenido, {{ session.get('usuario') }}. Rol actual: <strong>{{ session.get('rol') }}</strong>.</p>
+        </div>
+
+        <div class="cards">
+
+            <div class="card blue">
+                <h3>Productos registrados</h3>
+                <div class="number">{{ productos }}</div>
+            </div>
+
+            <div class="card green">
+                <h3>Ventas registradas</h3>
+                <div class="number">{{ ventas }}</div>
+            </div>
+
+            {% if session.get('rol') == 'admin' %}
+                <div class="card orange">
+                    <h3>Total vendido</h3>
+                    <div class="number">$ {{ "{:,.0f}".format(total_ventas) }}</div>
+                </div>
+
+                <div class="card purple">
+                    <h3>Ganancia total</h3>
+                    <div class="number">$ {{ "{:,.0f}".format(total_ganancias) }}</div>
+                </div>
+            {% endif %}
+
+        </div>
+
+        {% if session.get('rol') == 'admin' %}
+
+        <div class="cards">
+
+            <div class="card blue">
+                <h3>Inventario a costo</h3>
+                <div class="number">$ {{ "{:,.0f}".format(total_inventario_costo) }}</div>
+            </div>
+
+            <div class="card green">
+                <h3>Inventario a venta</h3>
+                <div class="number">$ {{ "{:,.0f}".format(total_inventario_venta) }}</div>
+            </div>
+
+            <div class="card orange">
+                <h3>Utilidad proyectada</h3>
+                <div class="number">$ {{ "{:,.0f}".format(utilidad_proyectada) }}</div>
+            </div>
+
+        </div>
+
+        {% endif %}
+
+        <div class="panel">
+            <h2>Accesos rápidos</h2>
+            <p>Gestiona las áreas principales del sistema desde este panel.</p>
+
+            <div class="actions">
+
+                <a class="action" href="/inventario">
+                    <strong>Inventario</strong><br>
+                    Consultar productos, stock y precios disponibles.
+                </a>
+
+                <a class="action" href="/ventas">
+                    <strong>Ventas</strong><br>
+                    Registrar ventas con precio manual y control automático de stock.
+                </a>
+
+                {% if session.get('rol') == 'admin' %}
+                    <a class="action" href="/informes">
+                        <strong>Informes</strong><br>
+                        Filtrar ventas y descargar reportes en Excel.
+                    </a>
+                {% endif %}
+
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,491 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ventas | MOTRIX</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            background: #111827;
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding: 25px 20px;
+        }
+
+        .sidebar h2 {
+            margin: 0 0 35px;
+            font-size: 26px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #d1d5db;
+            text-decoration: none;
+            margin: 15px 0;
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .sidebar a:hover,
+        .sidebar .active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .content {
+            margin-left: 240px;
+            padding: 30px;
+        }
+
+        .topbar,
+        .panel,
+        .card {
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .topbar {
+            padding: 22px 25px;
+            margin-bottom: 25px;
+        }
+
+        .topbar h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        .topbar p {
+            margin: 8px 0 0;
+            color: #6b7280;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            padding: 22px;
+        }
+
+        .card h3 {
+            margin: 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .number {
+            margin-top: 10px;
+            font-size: 27px;
+            font-weight: bold;
+        }
+
+        .blue {
+            border-left: 6px solid #2563eb;
+        }
+
+        .green {
+            border-left: 6px solid #16a34a;
+        }
+
+        .orange {
+            border-left: 6px solid #f97316;
+        }
+
+        .panel {
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+            gap: 15px;
+            align-items: end;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: #4b5563;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .btn {
+            border: none;
+            padding: 12px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-edit {
+            background: #f59e0b;
+            color: white;
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        .btn-delete {
+            background: #dc2626;
+            color: white;
+            padding: 8px 12px;
+            font-size: 13px;
+        }
+
+        .btn-report {
+            background: #111827;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .search-box {
+            max-width: 320px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #111827;
+            color: white;
+        }
+
+        th, td {
+            padding: 14px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .money {
+            font-weight: bold;
+        }
+
+        .gain {
+            color: #15803d;
+            font-weight: bold;
+        }
+
+        .discount {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .badge {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-weight: bold;
+            font-size: 12px;
+            display: inline-block;
+            background: #dbeafe;
+            color: #1e40af;
+            text-transform: capitalize;
+        }
+
+        @media (max-width: 1200px) {
+            .cards,
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 750px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .content {
+                margin-left: 0;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>MOTRIX</h2>
+
+        <a href="/">Dashboard</a>
+        <a href="/inventario">Inventario</a>
+        <a class="active" href="/ventas">Ventas</a>
+
+        {% if session.get('rol') == 'admin' %}
+            <a href="/informes">Informes</a>
+            <a href="/usuarios">Usuarios</a>
+        {% endif %}
+
+        <a href="/logout">Cerrar sesión</a>
+    </div>
+
+    <div class="content">
+
+        <div class="topbar">
+            <h1>Ventas</h1>
+            <p>Registro de ventas con precio manual, método de pago, hora exacta y control automático de stock.</p>
+        </div>
+
+        {% set total_vendido = ventas | sum(attribute='total') %}
+        {% set total_ganancia_neta = ventas | sum(attribute='ganancia_neta') %}
+        {% set total_descuento_pago = ventas | sum(attribute='descuento_pago') %}
+
+        <div class="cards">
+
+            <div class="card blue">
+                <h3>Ventas registradas</h3>
+                <div class="number">{{ ventas | length }}</div>
+            </div>
+
+            <div class="card green">
+                <h3>Total vendido</h3>
+                <div class="number">$ {{ "{:,.0f}".format(total_vendido or 0) }}</div>
+            </div>
+
+            {% if session.get('rol') == 'admin' %}
+                <div class="card orange">
+                    <h3>Descuentos por pago</h3>
+                    <div class="number">$ {{ "{:,.0f}".format(total_descuento_pago or 0) }}</div>
+                </div>
+            {% endif %}
+
+        </div>
+
+        {% if session.get('rol') == 'admin' %}
+            <a class="btn btn-report" href="/informes">Ver informes</a>
+        {% endif %}
+
+        <div class="panel">
+            <h2>Registrar nueva venta</h2>
+
+            <form action="/registrar_venta" method="POST">
+
+                <div class="form-grid">
+
+                    <div>
+                        <label>Producto</label>
+                        <select name="producto_id" required>
+                            <option value="">Seleccione un producto</option>
+
+                            {% for producto in productos %}
+                                <option value="{{ producto.id }}">
+                                    {{ producto.nombre }} | Stock: {{ producto.stock }} | Precio sugerido: $ {{ "{:,.0f}".format(producto.precio_venta or 0) }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Cantidad</label>
+                        <input type="number" name="cantidad" min="1" required>
+                    </div>
+
+                    <div>
+                        <label>Precio venta real</label>
+                        <input type="number" name="precio_venta_manual" min="1" placeholder="Ej: 75000" required>
+                    </div>
+
+                    <div>
+                        <label>Método de pago</label>
+                        <select name="metodo_pago" required>
+                            <option value="">Seleccione</option>
+                            <option value="efectivo">Efectivo</option>
+                            <option value="transferencia">Transferencia</option>
+                            <option value="datafono">Datáfono</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Fecha y hora</label>
+                        <input type="datetime-local" name="fecha_venta" required>
+                    </div>
+
+                    <div>
+                        <button class="btn btn-primary" type="submit">Registrar venta</button>
+                    </div>
+
+                </div>
+
+            </form>
+        </div>
+
+        <div class="panel">
+
+            <div class="table-header">
+                <div>
+                    <h2>Historial de ventas</h2>
+                    <p style="margin: 0; color: #6b7280;">
+                        {% if session.get('rol') == 'admin' %}
+                            Vista administrativa completa. El descuento se calcula sobre el total pagado, no sobre la ganancia.
+                        {% else %}
+                            Vista de ventas registradas por tu usuario.
+                        {% endif %}
+                    </p>
+                </div>
+
+                <input class="search-box" type="text" id="buscador" placeholder="Buscar venta..." onkeyup="buscarVenta()">
+            </div>
+
+            <table id="tablaVentas">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Método pago</th>
+                        <th>Precio venta</th>
+                        <th>Total</th>
+
+                        {% if session.get('rol') == 'admin' %}
+                            <th>Ganancia bruta</th>
+                            <th>Descuento pago</th>
+                            <th>Ganancia neta</th>
+                        {% endif %}
+
+                        <th>Vendedor</th>
+                        <th>Fecha y hora</th>
+
+                        {% if session.get('rol') == 'admin' %}
+                            <th>Acciones</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for venta in ventas %}
+                    <tr>
+                        <td><strong>{{ venta.producto }}</strong></td>
+                        <td>{{ venta.cantidad }}</td>
+                        <td><span class="badge">{{ venta.metodo_pago }}</span></td>
+                        <td class="money">$ {{ "{:,.0f}".format(venta.precio_venta or 0) }}</td>
+                        <td class="money">$ {{ "{:,.0f}".format(venta.total or 0) }}</td>
+
+                        {% if session.get('rol') == 'admin' %}
+                            <td class="gain">$ {{ "{:,.0f}".format(venta.ganancia_bruta or 0) }}</td>
+                            <td class="discount">$ {{ "{:,.0f}".format(venta.descuento_pago or 0) }}</td>
+                            <td class="gain">$ {{ "{:,.0f}".format(venta.ganancia_neta or 0) }}</td>
+                        {% endif %}
+
+                        <td>{{ venta.vendedor }}</td>
+                        <td>{{ venta.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+
+                        {% if session.get('rol') == 'admin' %}
+                            <td>
+                                <a class="btn btn-edit" href="/editar_venta/{{ venta.id }}">Editar</a>
+
+                                <a class="btn btn-delete"
+                                   href="/eliminar_venta/{{ venta.id }}"
+                                   onclick="return confirm('¿Seguro que deseas eliminar esta venta? El stock será restaurado.')">
+                                   Eliminar
+                                </a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="11">Todavía no hay ventas registradas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+
+    </div>
+
+    <script>
+        function buscarVenta() {
+            let input = document.getElementById("buscador");
+            let filtro = input.value.toLowerCase();
+            let tabla = document.getElementById("tablaVentas");
+            let filas = tabla.getElementsByTagName("tr");
+
+            for (let i = 1; i < filas.length; i++) {
+                let textoFila = filas[i].textContent.toLowerCase();
+
+                if (textoFila.includes(filtro)) {
+                    filas[i].style.display = "";
+                } else {
+                    filas[i].style.display = "none";
+                }
+            }
+        }
+
+        window.addEventListener('load', function () {
+            const fechaInput = document.querySelector('input[name="fecha_venta"]');
+
+            if (fechaInput && !fechaInput.value) {
+                const ahora = new Date();
+                ahora.setMinutes(ahora.getMinutes() - ahora.getTimezoneOffset());
+                fechaInput.value = ahora.toISOString().slice(0, 16);
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,217 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar venta | MOTRIX</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            background: #111827;
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding: 25px 20px;
+        }
+
+        .sidebar h2 {
+            margin: 0 0 35px;
+            font-size: 26px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #d1d5db;
+            text-decoration: none;
+            margin: 15px 0;
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .sidebar a:hover {
+            background: #2563eb;
+            color: white;
+        }
+
+        .content {
+            margin-left: 240px;
+            padding: 30px;
+        }
+
+        .panel {
+            background: white;
+            padding: 25px;
+            border-radius: 18px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            max-width: 750px;
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: #4b5563;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 14px;
+            margin-bottom: 18px;
+        }
+
+        .info {
+            background: #f9fafb;
+            border-left: 5px solid #2563eb;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .warning {
+            background: #fff7ed;
+            border-left: 5px solid #f97316;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            color: #7c2d12;
+            line-height: 1.6;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        .btn {
+            border: none;
+            padding: 13px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        @media (max-width: 750px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .content {
+                margin-left: 0;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>MOTRIX</h2>
+
+        <a href="/">Dashboard</a>
+        <a href="/inventario">Inventario</a>
+        <a href="/ventas">Ventas</a>
+        <a href="/informes">Informes</a>
+        <a href="/usuarios">Usuarios</a>
+        <a href="/logout">Cerrar sesión</a>
+    </div>
+
+    <div class="content">
+
+        <div class="panel">
+            <h1>Editar venta</h1>
+
+            <div class="info">
+                <strong>Producto:</strong> {{ venta.producto }}<br>
+                <strong>Vendedor:</strong> {{ venta.vendedor }}<br>
+                <strong>Fecha actual:</strong> {{ venta.fecha.strftime('%d/%m/%Y %H:%M') }}<br>
+                <strong>Precio costo unitario:</strong> $ {{ "{:,.0f}".format(venta.precio_costo or 0) }}
+            </div>
+
+            <div class="warning">
+                El descuento de datáfono o transferencia se calcula sobre el valor total pagado por el cliente, no sobre la ganancia.
+                Al modificar la cantidad, el sistema ajusta automáticamente el stock.
+            </div>
+
+            <form action="/editar_venta/{{ venta.id }}" method="POST">
+
+                <div class="form-grid">
+
+                    <div>
+                        <label>Cantidad</label>
+                        <input type="number" name="cantidad" min="1" value="{{ venta.cantidad }}" required>
+                    </div>
+
+                    <div>
+                        <label>Precio de venta real</label>
+                        <input type="number" name="precio_venta" min="1" value="{{ venta.precio_venta }}" required>
+                    </div>
+
+                    <div>
+                        <label>Método de pago</label>
+                        <select name="metodo_pago" required>
+                            <option value="">Seleccione</option>
+                            <option value="efectivo" {% if venta.metodo_pago == 'efectivo' %}selected{% endif %}>Efectivo</option>
+                            <option value="transferencia" {% if venta.metodo_pago == 'transferencia' %}selected{% endif %}>Transferencia</option>
+                            <option value="datafono" {% if venta.metodo_pago == 'datafono' %}selected{% endif %}>Datáfono</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label>Fecha y hora exacta</label>
+                        <input type="datetime-local" name="fecha_venta" value="{{ venta.fecha.strftime('%Y-%m-%dT%H:%M') }}" required>
+                    </div>
+
+                </div>
+
+                <button class="btn btn-primary" type="submit">Guardar cambios</button>
+                <a class="btn btn-secondary" href="/ventas">Cancelar</a>
+
+            </form>
+        </div>
+
+    </div>
+
+</body>
+</html>

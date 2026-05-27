@@ -1,0 +1,195 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar producto | MOTRIX</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        .sidebar {
+            width: 240px;
+            height: 100vh;
+            background: #111827;
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding: 25px 20px;
+        }
+
+        .sidebar h2 {
+            margin: 0 0 35px;
+            font-size: 26px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #d1d5db;
+            text-decoration: none;
+            margin: 15px 0;
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .sidebar a:hover {
+            background: #2563eb;
+            color: white;
+        }
+
+        .content {
+            margin-left: 240px;
+            padding: 30px;
+        }
+
+        .panel {
+            background: white;
+            padding: 25px;
+            border-radius: 18px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            max-width: 750px;
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: #4b5563;
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .btn {
+            border: none;
+            padding: 13px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        @media (max-width: 750px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .content {
+                margin-left: 0;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>MOTRIX</h2>
+
+        <a href="/">Dashboard</a>
+        <a href="/inventario">Inventario</a>
+        <a href="/ventas">Ventas</a>
+        <a href="/informes">Informes</a>
+        <a href="/usuarios">Usuarios</a>
+        <a href="/logout">Cerrar sesión</a>
+    </div>
+
+    <div class="content">
+
+        <div class="panel">
+            <h1>Editar producto</h1>
+
+            <form action="/editar_producto/{{ producto.id }}" method="POST">
+
+                <div class="form-grid">
+
+                    <div>
+                        <label>Referencia</label>
+                        <input type="text" name="referencia" value="{{ producto.referencia }}" required>
+                    </div>
+
+                    <div>
+                        <label>Nombre</label>
+                        <input type="text" name="nombre" value="{{ producto.nombre }}" required>
+                    </div>
+
+                    <div>
+                        <label>Marca</label>
+                        <input type="text" name="marca" value="{{ producto.marca }}" required>
+                    </div>
+
+                    <div>
+                        <label>Categoría</label>
+                        <input type="text" name="categoria" value="{{ producto.categoria }}" required>
+                    </div>
+
+                    <div>
+                        <label>Stock</label>
+                        <input type="number" name="stock" min="0" value="{{ producto.stock }}" required>
+                    </div>
+
+                    <div>
+                        <label>Precio compra</label>
+                        <input type="number" name="precio_compra" min="0" value="{{ producto.precio_compra }}" required>
+                    </div>
+
+                    <div>
+                        <label>Precio venta sugerido</label>
+                        <input type="number" name="precio_venta" min="0" value="{{ producto.precio_venta }}" required>
+                    </div>
+
+                </div>
+
+                <button class="btn btn-primary" type="submit">Guardar cambios</button>
+                <a class="btn btn-secondary" href="/inventario">Cancelar</a>
+
+            </form>
+        </div>
+
+    </div>
+
+</body>
+</html>
