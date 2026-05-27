@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -75,6 +75,53 @@
             color: #6b7280;
         }
 
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            padding: 22px;
+        }
+
+        .card h3 {
+            margin: 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .number {
+            margin-top: 10px;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .green {
+            border-left: 6px solid #16a34a;
+        }
+
+        .blue {
+            border-left: 6px solid #2563eb;
+        }
+
+        .yellow {
+            border-left: 6px solid #f59e0b;
+        }
+
+        .red {
+            border-left: 6px solid #dc2626;
+        }
+
+        .purple {
+            border-left: 6px solid #7c3aed;
+        }
+
+        .dark {
+            border-left: 6px solid #111827;
+        }
+
         .panel {
             padding: 25px;
             margin-bottom: 25px;
@@ -87,11 +134,12 @@
             align-items: end;
         }
 
-        .cost-grid {
+        .filter-grid-2 {
             display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
+            grid-template-columns: 2fr 1fr 1fr auto;
             gap: 15px;
-            margin-top: 18px;
+            align-items: end;
+            margin-top: 15px;
         }
 
         label {
@@ -119,8 +167,7 @@
             font-weight: bold;
             text-decoration: none;
             display: inline-block;
-            margin-right: 8px;
-            margin-bottom: 8px;
+            text-align: center;
         }
 
         .btn-primary {
@@ -128,71 +175,21 @@
             color: white;
         }
 
-        .btn-excel {
+        .btn-green {
             background: #16a34a;
             color: white;
         }
 
-        .btn-clear {
+        .btn-gray {
             background: #6b7280;
             color: white;
         }
 
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-            margin-bottom: 25px;
-        }
-
-        .card {
-            padding: 22px;
-        }
-
-        .card h3 {
-            margin: 0;
-            color: #6b7280;
-            font-size: 14px;
-        }
-
-        .number {
-            margin-top: 10px;
-            font-size: 26px;
-            font-weight: bold;
-        }
-
-        .blue {
-            border-left: 6px solid #2563eb;
-        }
-
-        .green {
-            border-left: 6px solid #16a34a;
-        }
-
-        .orange {
-            border-left: 6px solid #f97316;
-        }
-
-        .red {
-            border-left: 6px solid #dc2626;
-        }
-
-        .purple {
-            border-left: 6px solid #7c3aed;
-        }
-
-        .dark {
-            border-left: 6px solid #111827;
-        }
-
-        .note {
-            background: #f9fafb;
-            border-left: 5px solid #2563eb;
-            padding: 14px;
-            border-radius: 10px;
-            color: #4b5563;
-            margin-bottom: 18px;
-            line-height: 1.6;
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 18px;
         }
 
         table {
@@ -206,7 +203,7 @@
         }
 
         th, td {
-            padding: 14px;
+            padding: 13px;
             border-bottom: 1px solid #e5e7eb;
             text-align: left;
             font-size: 14px;
@@ -216,23 +213,19 @@
             background: #f9fafb;
         }
 
-        .money {
+        .money-positive {
             font-weight: bold;
+            color: #16a34a;
         }
 
-        .gain {
-            color: #15803d;
+        .money-negative {
             font-weight: bold;
-        }
-
-        .discount {
             color: #dc2626;
-            font-weight: bold;
         }
 
-        .final {
-            color: #7c3aed;
+        .money-neutral {
             font-weight: bold;
+            color: #111827;
         }
 
         .badge {
@@ -246,11 +239,47 @@
             text-transform: capitalize;
         }
 
-        @media (max-width: 1100px) {
+        .note {
+            background: #f9fafb;
+            border-left: 5px solid #2563eb;
+            padding: 14px;
+            border-radius: 10px;
+            color: #4b5563;
+            margin-bottom: 18px;
+            line-height: 1.6;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .summary-box {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .summary-box small {
+            color: #6b7280;
+            font-weight: bold;
+        }
+
+        .summary-box div {
+            margin-top: 7px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 1200px) {
+            .cards,
             .filter-grid,
-            .cost-grid,
-            .cards {
-                grid-template-columns: 1fr;
+            .filter-grid-2,
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
@@ -263,6 +292,13 @@
 
             .content {
                 margin-left: 0;
+            }
+
+            .cards,
+            .filter-grid,
+            .filter-grid-2,
+            .summary-grid {
+                grid-template-columns: 1fr;
             }
 
             table {
@@ -278,10 +314,10 @@
 
     <div class="sidebar">
         <h2>MOTRIX</h2>
-
         <a href="/">Dashboard</a>
         <a href="/inventario">Inventario</a>
         <a href="/ventas">Ventas</a>
+        <a href="/gastos">Gastos</a>
         <a class="active" href="/informes">Informes</a>
         <a href="/usuarios">Usuarios</a>
         <a href="/logout">Cerrar sesión</a>
@@ -290,30 +326,25 @@
     <div class="content">
 
         <div class="topbar">
-            <h1>Informes de ventas</h1>
-            <p>Filtra ventas, registra costos fijos, calcula promedio diario y genera proyecciones.</p>
+            <h1>Informes administrativos</h1>
+            <p>Resumen de ventas, descuentos por método de pago, gastos registrados y ganancia final.</p>
         </div>
 
         <div class="panel">
-            <h2>Filtros, costos y proyección</h2>
+            <h2>Filtros del informe</h2>
 
             <div class="note">
-                El descuento de <strong>datáfono</strong> y <strong>transferencia</strong> se calcula sobre el valor total pagado por el cliente, no sobre la ganancia. El costo fijo se descuenta después para obtener la ganancia final.
+                Los gastos registrados se descuentan automáticamente según el mismo filtro de fecha y vendedor aplicado a las ventas.
             </div>
 
-            <form action="/informes" method="GET">
-
+            <form method="GET" action="/informes">
                 <div class="filter-grid">
-
                     <div>
                         <label>Vendedor</label>
                         <select name="vendedor">
                             <option value="">Todos</option>
-
                             {% for item in vendedores %}
-                                <option value="{{ item[0] }}" {% if vendedor == item[0] %}selected{% endif %}>
-                                    {{ item[0] }}
-                                </option>
+                                <option value="{{ item[0] }}" {% if vendedor == item[0] %}selected{% endif %}>{{ item[0] }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -322,11 +353,8 @@
                         <label>Producto</label>
                         <select name="producto">
                             <option value="">Todos</option>
-
                             {% for item in productos %}
-                                <option value="{{ item[0] }}" {% if producto == item[0] %}selected{% endif %}>
-                                    {{ item[0] }}
-                                </option>
+                                <option value="{{ item[0] }}" {% if producto == item[0] %}selected{% endif %}>{{ item[0] }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -340,124 +368,131 @@
                         <label>Fecha final</label>
                         <input type="date" name="fecha_fin" value="{{ fecha_fin }}">
                     </div>
-
                 </div>
 
-                <div class="cost-grid">
-
+                <div class="filter-grid-2">
                     <div>
                         <label>Nombre del costo fijo</label>
-                        <input type="text" name="costo_fijo_nombre" value="{{ costo_fijo_nombre }}" placeholder="Ej: Día de empleado, arriendo, transporte">
+                        <input type="text" name="costo_fijo_nombre" value="{{ costo_fijo_nombre }}" placeholder="Ej: Arriendo, servicios, nómina, publicidad">
                     </div>
 
                     <div>
-                        <label>Valor del costo fijo</label>
-                        <input type="number" name="costo_fijo_valor" value="{{ costo_fijo_valor }}" min="0" placeholder="Ej: 50000">
+                        <label>Valor costo fijo</label>
+                        <input type="number" name="costo_fijo_valor" value="{{ costo_fijo_valor or 0 }}" min="0">
                     </div>
 
                     <div>
-                        <label>Días para proyección</label>
-                        <input type="number" name="dias_proyeccion" value="{{ dias_proyeccion }}" min="1" placeholder="Ej: 30">
+                        <label>Días de proyección</label>
+                        <input type="number" name="dias_proyeccion" value="{{ dias_proyeccion or 30 }}" min="1">
                     </div>
 
+                    <div>
+                        <button class="btn btn-primary" type="submit">Generar informe</button>
+                    </div>
                 </div>
 
-                <br>
-                <button class="btn btn-primary" type="submit">Generar informe</button>
+                <div class="actions">
+                    <a class="btn btn-gray" href="/informes">Limpiar filtros</a>
 
-                <a class="btn btn-clear" href="/informes">Limpiar filtros</a>
-
-                <a class="btn btn-excel"
-                   href="/descargar_informe_excel?vendedor={{ vendedor }}&producto={{ producto }}&fecha_inicio={{ fecha_inicio }}&fecha_fin={{ fecha_fin }}&costo_fijo_nombre={{ costo_fijo_nombre }}&costo_fijo_valor={{ costo_fijo_valor }}&dias_proyeccion={{ dias_proyeccion }}">
-                   Descargar Excel
-                </a>
-
+                    <a class="btn btn-green"
+                       href="/descargar_informe_excel?vendedor={{ vendedor }}&producto={{ producto }}&fecha_inicio={{ fecha_inicio }}&fecha_fin={{ fecha_fin }}&costo_fijo_nombre={{ costo_fijo_nombre }}&costo_fijo_valor={{ costo_fijo_valor }}&dias_proyeccion={{ dias_proyeccion }}">
+                       Descargar Excel
+                    </a>
+                </div>
             </form>
         </div>
 
         <div class="cards">
-
             <div class="card blue">
-                <h3>Cantidad vendida</h3>
-                <div class="number">{{ total_cantidad }}</div>
-            </div>
-
-            <div class="card green">
                 <h3>Total vendido</h3>
                 <div class="number">$ {{ "{:,.0f}".format(total_vendido or 0) }}</div>
             </div>
 
-            <div class="card orange">
+            <div class="card green">
                 <h3>Ganancia bruta</h3>
                 <div class="number">$ {{ "{:,.0f}".format(total_ganancia_bruta or 0) }}</div>
             </div>
 
-            <div class="card red">
-                <h3>Descuento por pago</h3>
+            <div class="card yellow">
+                <h3>Descuentos por pago</h3>
                 <div class="number">$ {{ "{:,.0f}".format(total_descuento_pago or 0) }}</div>
             </div>
 
+            <div class="card purple">
+                <h3>Ganancia neta antes de gastos</h3>
+                <div class="number">$ {{ "{:,.0f}".format(total_ganancia_neta_antes_costos or 0) }}</div>
+            </div>
+
             <div class="card red">
-                <h3>Costo fijo registrado</h3>
+                <h3>Gastos registrados</h3>
+                <div class="number">$ {{ "{:,.0f}".format(total_gastos_dia or 0) }}</div>
+            </div>
+
+            <div class="card red">
+                <h3>Costo fijo manual</h3>
                 <div class="number">$ {{ "{:,.0f}".format(costo_fijo_valor or 0) }}</div>
             </div>
 
-            <div class="card purple">
+            <div class="card dark">
                 <h3>Ganancia final</h3>
                 <div class="number">$ {{ "{:,.0f}".format(ganancia_final or 0) }}</div>
             </div>
 
-        </div>
-
-        <div class="cards">
-
-            <div class="card dark">
-                <h3>Días con ventas</h3>
-                <div class="number">{{ dias_con_ventas }}</div>
-            </div>
-
             <div class="card blue">
-                <h3>Promedio diario de ventas</h3>
-                <div class="number">$ {{ "{:,.0f}".format(promedio_dia_venta or 0) }}</div>
+                <h3>Cantidad vendida</h3>
+                <div class="number">{{ total_cantidad or 0 }}</div>
             </div>
-
-            <div class="card green">
-                <h3>Promedio diario de ganancia</h3>
-                <div class="number">$ {{ "{:,.0f}".format(promedio_dia_ganancia or 0) }}</div>
-            </div>
-
-            <div class="card orange">
-                <h3>Proyección ventas</h3>
-                <div class="number">$ {{ "{:,.0f}".format(proyeccion_ventas or 0) }}</div>
-            </div>
-
-            <div class="card purple">
-                <h3>Proyección ganancia</h3>
-                <div class="number">$ {{ "{:,.0f}".format(proyeccion_ganancia or 0) }}</div>
-            </div>
-
-            <div class="card dark">
-                <h3>Días proyectados</h3>
-                <div class="number">{{ dias_proyeccion }}</div>
-            </div>
-
         </div>
 
         <div class="panel">
-            <h2>Resultados de la consulta</h2>
+            <h2>Resumen de proyección</h2>
+
+            <div class="summary-grid">
+                <div class="summary-box">
+                    <small>Días con ventas</small>
+                    <div>{{ dias_con_ventas or 0 }}</div>
+                </div>
+
+                <div class="summary-box">
+                    <small>Promedio diario de ventas</small>
+                    <div>$ {{ "{:,.0f}".format(promedio_dia_venta or 0) }}</div>
+                </div>
+
+                <div class="summary-box">
+                    <small>Promedio diario de ganancia final</small>
+                    <div>$ {{ "{:,.0f}".format(promedio_dia_ganancia or 0) }}</div>
+                </div>
+
+                <div class="summary-box">
+                    <small>Días proyectados</small>
+                    <div>{{ dias_proyeccion or 0 }}</div>
+                </div>
+
+                <div class="summary-box">
+                    <small>Proyección de ventas</small>
+                    <div>$ {{ "{:,.0f}".format(proyeccion_ventas or 0) }}</div>
+                </div>
+
+                <div class="summary-box">
+                    <small>Proyección de ganancia</small>
+                    <div>$ {{ "{:,.0f}".format(proyeccion_ganancia or 0) }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Ventas incluidas en el informe</h2>
 
             <table>
                 <thead>
                     <tr>
-                        <th>Fecha y hora</th>
+                        <th>Fecha</th>
                         <th>Producto</th>
                         <th>Cantidad</th>
-                        <th>Precio costo</th>
                         <th>Precio venta</th>
                         <th>Total</th>
                         <th>Ganancia bruta</th>
                         <th>Método pago</th>
-                        <th>% desc.</th>
                         <th>Descuento</th>
                         <th>Ganancia neta</th>
                         <th>Vendedor</th>
@@ -470,24 +505,51 @@
                         <td>{{ venta.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
                         <td><strong>{{ venta.producto }}</strong></td>
                         <td>{{ venta.cantidad }}</td>
-                        <td class="money">$ {{ "{:,.0f}".format(venta.precio_costo or 0) }}</td>
-                        <td class="money">$ {{ "{:,.0f}".format(venta.precio_venta or 0) }}</td>
-                        <td class="money">$ {{ "{:,.0f}".format(venta.total or 0) }}</td>
-                        <td class="gain">$ {{ "{:,.0f}".format(venta.ganancia_bruta or 0) }}</td>
+                        <td>$ {{ "{:,.0f}".format(venta.precio_venta or 0) }}</td>
+                        <td class="money-neutral">$ {{ "{:,.0f}".format(venta.total or 0) }}</td>
+                        <td class="money-positive">$ {{ "{:,.0f}".format(venta.ganancia_bruta or 0) }}</td>
                         <td><span class="badge">{{ venta.metodo_pago }}</span></td>
-                        <td>{{ venta.porcentaje_descuento_pago }}%</td>
-                        <td class="discount">$ {{ "{:,.0f}".format(venta.descuento_pago or 0) }}</td>
-                        <td class="final">$ {{ "{:,.0f}".format(venta.ganancia_neta or 0) }}</td>
+                        <td class="money-negative">$ {{ "{:,.0f}".format(venta.descuento_pago or 0) }}</td>
+                        <td class="money-positive">$ {{ "{:,.0f}".format(venta.ganancia_neta or 0) }}</td>
                         <td>{{ venta.vendedor }}</td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="12">No hay resultados para los filtros seleccionados.</td>
+                        <td colspan="10">No hay ventas para los filtros seleccionados.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
+        </div>
 
+        <div class="panel">
+            <h2>Gastos descontados en este informe</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Descripción</th>
+                        <th>Valor</th>
+                        <th>Registrado por</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for gasto in gastos %}
+                    <tr>
+                        <td>{{ gasto.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td><strong>{{ gasto.descripcion }}</strong></td>
+                        <td class="money-negative">$ {{ "{:,.0f}".format(gasto.valor or 0) }}</td>
+                        <td>{{ gasto.registrado_por }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4">No hay gastos asociados a los filtros seleccionados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
 
     </div>
