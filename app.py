@@ -750,9 +750,18 @@ def crear_admin():
 # EJECUTAR
 # =====================================
 
-if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        crear_admin()
+# =====================================
+# CREAR BASE DE DATOS AL INICIAR
+# =====================================
 
+with app.app_context():
+    db.create_all()
+    crear_admin()
+
+
+# =====================================
+# EJECUTAR LOCALMENTE
+# =====================================
+
+if __name__ == '__main__':
     app.run(debug=True)
