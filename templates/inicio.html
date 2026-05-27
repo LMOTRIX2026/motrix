@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -30,7 +30,6 @@
         .sidebar h2 {
             margin: 0 0 35px;
             font-size: 26px;
-            letter-spacing: 1px;
         }
 
         .sidebar a {
@@ -40,7 +39,6 @@
             margin: 15px 0;
             padding: 12px;
             border-radius: 10px;
-            transition: 0.3s;
         }
 
         .sidebar a:hover,
@@ -54,11 +52,16 @@
             padding: 30px;
         }
 
-        .topbar {
+        .topbar,
+        .card,
+        .panel {
             background: white;
-            padding: 22px 25px;
             border-radius: 18px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .topbar {
+            padding: 22px 25px;
             margin-bottom: 25px;
         }
 
@@ -80,10 +83,7 @@
         }
 
         .card {
-            background: white;
-            border-radius: 18px;
             padding: 22px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         }
 
         .card h3 {
@@ -94,61 +94,62 @@
 
         .number {
             margin-top: 10px;
-            font-size: 27px;
+            font-size: 25px;
             font-weight: bold;
         }
 
-        .blue {
-            border-left: 6px solid #2563eb;
-        }
-
-        .green {
-            border-left: 6px solid #16a34a;
-        }
-
-        .orange {
-            border-left: 6px solid #f97316;
-        }
-
-        .purple {
-            border-left: 6px solid #7c3aed;
-        }
+        .blue { border-left: 6px solid #2563eb; }
+        .green { border-left: 6px solid #16a34a; }
+        .yellow { border-left: 6px solid #f59e0b; }
+        .red { border-left: 6px solid #dc2626; }
+        .purple { border-left: 6px solid #7c3aed; }
+        .dark { border-left: 6px solid #111827; }
 
         .panel {
-            background: white;
             padding: 25px;
-            border-radius: 18px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
             margin-bottom: 25px;
         }
 
-        .actions {
+        .quick-actions {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-            margin-top: 20px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
         }
 
         .action {
+            display: block;
+            text-decoration: none;
             background: #f9fafb;
             border: 1px solid #e5e7eb;
-            padding: 20px;
-            border-radius: 15px;
-            text-decoration: none;
+            padding: 18px;
+            border-radius: 14px;
             color: #111827;
-            transition: 0.3s;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .action span {
+            display: block;
+            margin-top: 6px;
+            color: #6b7280;
+            font-size: 13px;
+            font-weight: normal;
         }
 
         .action:hover {
             background: #2563eb;
             color: white;
-            transform: translateY(-3px);
+            transform: translateY(-2px);
         }
 
-        @media (max-width: 1000px) {
+        .action:hover span {
+            color: #dbeafe;
+        }
+
+        @media (max-width: 1200px) {
             .cards,
-            .actions {
-                grid-template-columns: 1fr;
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
@@ -162,6 +163,11 @@
             .content {
                 margin-left: 0;
             }
+
+            .cards,
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -174,6 +180,7 @@
         <a class="active" href="/">Dashboard</a>
         <a href="/inventario">Inventario</a>
         <a href="/ventas">Ventas</a>
+        <a href="/gastos">Gastos</a>
 
         {% if session.get('rol') == 'admin' %}
             <a href="/informes">Informes</a>
@@ -186,82 +193,77 @@
     <div class="content">
 
         <div class="topbar">
-            <h1>Panel principal</h1>
-            <p>Bienvenido, {{ session.get('usuario') }}. Rol actual: <strong>{{ session.get('rol') }}</strong>.</p>
+            <h1>Dashboard</h1>
+            <p>Bienvenido, {{ session.get('usuario') }}. Rol actual: {{ session.get('rol') }}.</p>
         </div>
 
         <div class="cards">
-
             <div class="card blue">
                 <h3>Productos registrados</h3>
-                <div class="number">{{ productos }}</div>
+                <div class="number">{{ productos or 0 }}</div>
             </div>
 
             <div class="card green">
                 <h3>Ventas registradas</h3>
-                <div class="number">{{ ventas }}</div>
+                <div class="number">{{ ventas or 0 }}</div>
             </div>
 
-            {% if session.get('rol') == 'admin' %}
-                <div class="card orange">
-                    <h3>Total vendido</h3>
-                    <div class="number">$ {{ "{:,.0f}".format(total_ventas) }}</div>
-                </div>
+            <div class="card yellow">
+                <h3>Total vendido</h3>
+                <div class="number">$ {{ "{:,.0f}".format(total_ventas or 0) }}</div>
+            </div>
 
-                <div class="card purple">
-                    <h3>Ganancia total</h3>
-                    <div class="number">$ {{ "{:,.0f}".format(total_ganancias) }}</div>
-                </div>
-            {% endif %}
+            <div class="card red">
+                <h3>Gastos registrados</h3>
+                <div class="number">$ {{ "{:,.0f}".format(total_gastos or 0) }}</div>
+            </div>
 
-        </div>
+            <div class="card purple">
+                <h3>Ganancias netas</h3>
+                <div class="number">$ {{ "{:,.0f}".format(total_ganancias or 0) }}</div>
+            </div>
 
-        {% if session.get('rol') == 'admin' %}
-
-        <div class="cards">
+            <div class="card dark">
+                <h3>Inventario a costo</h3>
+                <div class="number">$ {{ "{:,.0f}".format(total_inventario_costo or 0) }}</div>
+            </div>
 
             <div class="card blue">
-                <h3>Inventario a costo</h3>
-                <div class="number">$ {{ "{:,.0f}".format(total_inventario_costo) }}</div>
+                <h3>Inventario a venta</h3>
+                <div class="number">$ {{ "{:,.0f}".format(total_inventario_venta or 0) }}</div>
             </div>
 
             <div class="card green">
-                <h3>Inventario a venta</h3>
-                <div class="number">$ {{ "{:,.0f}".format(total_inventario_venta) }}</div>
-            </div>
-
-            <div class="card orange">
                 <h3>Utilidad proyectada</h3>
-                <div class="number">$ {{ "{:,.0f}".format(utilidad_proyectada) }}</div>
+                <div class="number">$ {{ "{:,.0f}".format(utilidad_proyectada or 0) }}</div>
             </div>
-
         </div>
-
-        {% endif %}
 
         <div class="panel">
             <h2>Accesos rápidos</h2>
-            <p>Gestiona las áreas principales del sistema desde este panel.</p>
 
-            <div class="actions">
-
+            <div class="quick-actions">
                 <a class="action" href="/inventario">
-                    <strong>Inventario</strong><br>
-                    Consultar productos, stock y precios disponibles.
+                    Inventario
+                    <span>Consultar productos, stock y precios.</span>
                 </a>
 
                 <a class="action" href="/ventas">
-                    <strong>Ventas</strong><br>
-                    Registrar ventas con precio manual y control automático de stock.
+                    Ventas
+                    <span>Registrar ventas y consultar historial.</span>
+                </a>
+
+                <a class="action" href="/gastos">
+                    Gastos
+                    <span>Registrar gastos del día.</span>
                 </a>
 
                 {% if session.get('rol') == 'admin' %}
                     <a class="action" href="/informes">
-                        <strong>Informes</strong><br>
-                        Filtrar ventas y descargar reportes en Excel.
+                        Informes
+                        <span>Ver ventas, gastos y ganancia final.</span>
                     </a>
                 {% endif %}
-
             </div>
         </div>
 
