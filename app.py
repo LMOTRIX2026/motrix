@@ -1,4 +1,6 @@
-﻿from flask import Flask, render_template, request, redirect, session, send_file
+import os
+
+from flask import Flask, render_template, request, redirect, session, send_file
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -20,7 +22,12 @@ app.secret_key = 'motrix_secret_key'
 # BASE DE DATOS
 # =====================================
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///motrix.db'
+database_url = os.environ.get('DATABASE_URL', 'sqlite:///motrix.db')
+
+if database_url.startswith('postgres://'):
+    database_url = database_url.replace('postgres://', 'postgresql://', 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
