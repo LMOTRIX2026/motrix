@@ -3,3 +3,4 @@ Flask-SQLAlchemy
 Werkzeug
 gunicorn
 openpyxl
+psycopg2-binary
