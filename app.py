@@ -22,6 +22,8 @@ app.secret_key = 'motrix_secret_key'
 # BASE DE DATOS
 # =====================================
 
+# En Render usa la variable DATABASE_URL de Neon.
+# En local, si no existe DATABASE_URL, usa SQLite.
 database_url = os.environ.get('DATABASE_URL', 'sqlite:///motrix.db')
 
 if database_url.startswith('postgres://'):
@@ -133,9 +135,8 @@ def calcular_valores_venta(precio_costo, precio_venta, cantidad, metodo_pago):
 
     porcentaje_descuento_pago = calcular_porcentaje_descuento_pago(metodo_pago)
 
-    # IMPORTANTE:
-    # El descuento de datáfono o transferencia se calcula sobre el valor real pagado/transferido,
-    # es decir, sobre el TOTAL de la venta, no sobre la ganancia.
+    # El descuento por datáfono o transferencia se calcula sobre el total pagado,
+    # no sobre la ganancia.
     descuento_pago = round(total * (porcentaje_descuento_pago / 100))
 
     ganancia_neta = ganancia_bruta - descuento_pago
@@ -170,6 +171,27 @@ def aplicar_filtros_ventas():
     ventas = consulta.order_by(Venta.fecha.desc()).all()
 
     return ventas, vendedor, producto, fecha_inicio, fecha_fin
+
+
+def aplicar_filtros_gastos(vendedor='', fecha_inicio='', fecha_fin=''):
+    consulta = Gasto.query
+
+    if vendedor:
+        consulta = consulta.filter(Gasto.registrado_por.ilike(f"%{vendedor}%"))
+
+    fecha_inicio_convertida = convertir_fecha(fecha_inicio)
+    fecha_fin_convertida = convertir_fecha(fecha_fin)
+
+    if fecha_inicio_convertida:
+        consulta = consulta.filter(Gasto.fecha >= fecha_inicio_convertida)
+
+    if fecha_fin_convertida:
+        fecha_fin_convertida = fecha_fin_convertida.replace(hour=23, minute=59, second=59)
+        consulta = consulta.filter(Gasto.fecha <= fecha_fin_convertida)
+
+    gastos = consulta.order_by(Gasto.fecha.desc()).all()
+
+    return gastos
 
 
 # =====================================
@@ -213,6 +235,14 @@ class Venta(db.Model):
     fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
 
+class Gasto(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    descripcion = db.Column(db.String(250))
+    valor = db.Column(db.Integer)
+    registrado_por = db.Column(db.String(100))
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 # =====================================
 # LOGIN / LOGOUT
 # =====================================
@@ -253,8 +283,10 @@ def inicio():
 
     if session.get('rol') == 'admin':
         ventas = Venta.query.count()
+        total_gastos = db.session.query(db.func.sum(Gasto.valor)).scalar() or 0
     else:
         ventas = Venta.query.filter_by(vendedor=session.get('usuario')).count()
+        total_gastos = db.session.query(db.func.sum(Gasto.valor)).filter_by(registrado_por=session.get('usuario')).scalar() or 0
 
     total_ventas = db.session.query(db.func.sum(Venta.total)).scalar() or 0
     total_ganancias = db.session.query(db.func.sum(Venta.ganancia_neta)).scalar() or 0
@@ -267,6 +299,7 @@ def inicio():
         ventas=ventas,
         total_ventas=total_ventas,
         total_ganancias=total_ganancias,
+        total_gastos=total_gastos,
         total_inventario_costo=total_inventario_costo,
         total_inventario_venta=total_inventario_venta,
         utilidad_proyectada=utilidad_proyectada
@@ -531,6 +564,62 @@ def editar_venta(id):
 
 
 # =====================================
+# GASTOS
+# =====================================
+
+@app.route('/gastos')
+@login_requerido
+def gastos():
+    if session.get('rol') == 'admin':
+        gastos = Gasto.query.order_by(Gasto.fecha.desc()).all()
+    else:
+        gastos = Gasto.query.filter_by(registrado_por=session.get('usuario')).order_by(Gasto.fecha.desc()).all()
+
+    total_gastos = sum((gasto.valor or 0) for gasto in gastos)
+
+    return render_template(
+        'gastos.html',
+        gastos=gastos,
+        total_gastos=total_gastos
+    )
+
+
+@app.route('/registrar_gasto', methods=['POST'])
+@login_requerido
+def registrar_gasto():
+    descripcion = request.form.get('descripcion', '').strip()
+    valor = convertir_entero(request.form.get('valor', '0'))
+    fecha_gasto = convertir_fecha_hora(request.form.get('fecha_gasto', ''))
+
+    if not descripcion:
+        return "Debes ingresar la descripción del gasto"
+
+    if valor <= 0:
+        return "Debes ingresar un valor de gasto válido"
+
+    nuevo_gasto = Gasto(
+        descripcion=descripcion,
+        valor=valor,
+        registrado_por=session.get('usuario'),
+        fecha=fecha_gasto
+    )
+
+    db.session.add(nuevo_gasto)
+    db.session.commit()
+
+    return redirect('/gastos')
+
+
+@app.route('/eliminar_gasto/<int:id>')
+@admin_requerido
+def eliminar_gasto(id):
+    gasto = Gasto.query.get_or_404(id)
+    db.session.delete(gasto)
+    db.session.commit()
+    return redirect('/gastos')
+
+
+# =====================================
 # INFORMES
 # =====================================
 
@@ -538,6 +627,8 @@ def editar_venta(id):
 @admin_requerido
 def informes():
     ventas, vendedor, producto, fecha_inicio, fecha_fin = aplicar_filtros_ventas()
+
+    gastos = aplicar_filtros_gastos(vendedor, fecha_inicio, fecha_fin)
 
     costo_fijo_nombre = request.args.get('costo_fijo_nombre', '')
     costo_fijo_valor = convertir_entero(request.args.get('costo_fijo_valor', '0'))
@@ -549,7 +640,10 @@ def informes():
     total_descuento_pago = sum((venta.descuento_pago or 0) for venta in ventas)
     total_ganancia_neta_antes_costos = sum((venta.ganancia_neta or 0) for venta in ventas)
     total_cantidad = sum((venta.cantidad or 0) for venta in ventas)
-    ganancia_final = total_ganancia_neta_antes_costos - costo_fijo_valor
+
+    total_gastos_dia = sum((gasto.valor or 0) for gasto in gastos)
+
+    ganancia_final = total_ganancia_neta_antes_costos - costo_fijo_valor - total_gastos_dia
 
     fechas_unicas = set()
     for venta in ventas:
@@ -574,11 +668,13 @@ def informes():
     return render_template(
         'informes.html',
         ventas=ventas,
+        gastos=gastos,
         total_vendido=total_vendido,
         total_ganancia_bruta=total_ganancia_bruta,
         total_descuento_pago=total_descuento_pago,
         total_ganancia_neta_antes_costos=total_ganancia_neta_antes_costos,
         total_cantidad=total_cantidad,
+        total_gastos_dia=total_gastos_dia,
         costo_fijo_nombre=costo_fijo_nombre,
         costo_fijo_valor=costo_fijo_valor,
         ganancia_final=ganancia_final,
@@ -601,6 +697,7 @@ def informes():
 @admin_requerido
 def descargar_informe_excel():
     ventas, vendedor, producto, fecha_inicio, fecha_fin = aplicar_filtros_ventas()
+    gastos = aplicar_filtros_gastos(vendedor, fecha_inicio, fecha_fin)
 
     costo_fijo_nombre = request.args.get('costo_fijo_nombre', '')
     costo_fijo_valor = convertir_entero(request.args.get('costo_fijo_valor', '0'))
@@ -611,7 +708,8 @@ def descargar_informe_excel():
     total_descuento_pago = sum((v.descuento_pago or 0) for v in ventas)
     total_ganancia_neta_antes_costos = sum((v.ganancia_neta or 0) for v in ventas)
     total_cantidad = sum((v.cantidad or 0) for v in ventas)
-    ganancia_final = total_ganancia_neta_antes_costos - costo_fijo_valor
+    total_gastos_dia = sum((g.valor or 0) for g in gastos)
+    ganancia_final = total_ganancia_neta_antes_costos - costo_fijo_valor - total_gastos_dia
 
     fechas_unicas = set()
     for venta in ventas:
@@ -642,6 +740,7 @@ def descargar_informe_excel():
     hoja.append(["Fecha final", fecha_fin or "Sin filtro"])
     hoja.append(["Costo fijo", costo_fijo_nombre or "No registrado"])
     hoja.append(["Valor costo fijo", costo_fijo_valor])
+    hoja.append(["Gastos registrados", total_gastos_dia])
     hoja.append(["Días con ventas", dias_con_ventas])
     hoja.append(["Promedio diario ventas", promedio_dia_venta])
     hoja.append(["Promedio diario ganancia", promedio_dia_ganancia])
@@ -676,13 +775,27 @@ def descargar_informe_excel():
         ])
 
     hoja.append([])
+    hoja.append(["GASTOS REGISTRADOS"])
+    hoja.append(["ID", "Fecha", "Descripción", "Valor", "Registrado por"])
+
+    for gasto in gastos:
+        hoja.append([
+            gasto.id,
+            gasto.fecha.strftime('%d/%m/%Y %H:%M'),
+            gasto.descripcion,
+            gasto.valor,
+            gasto.registrado_por
+        ])
+
+    hoja.append([])
     hoja.append(["RESUMEN"])
     hoja.append(["TOTAL CANTIDAD", total_cantidad])
     hoja.append(["TOTAL VENDIDO", total_vendido])
     hoja.append(["GANANCIA BRUTA", total_ganancia_bruta])
     hoja.append(["DESCUENTOS POR MÉTODO DE PAGO", total_descuento_pago])
-    hoja.append(["GANANCIA NETA ANTES DE COSTOS FIJOS", total_ganancia_neta_antes_costos])
+    hoja.append(["GANANCIA NETA ANTES DE COSTOS Y GASTOS", total_ganancia_neta_antes_costos])
     hoja.append(["COSTO FIJO", costo_fijo_valor])
+    hoja.append(["GASTOS REGISTRADOS", total_gastos_dia])
     hoja.append(["GANANCIA FINAL", ganancia_final])
     hoja.append(["PROMEDIO DIARIO DE VENTAS", promedio_dia_venta])
     hoja.append(["PROMEDIO DIARIO DE GANANCIA", promedio_dia_ganancia])
@@ -703,13 +816,12 @@ def descargar_informe_excel():
             celda.border = borde
             celda.alignment = Alignment(vertical='center')
 
-    fila_encabezados = 16
-    for celda in hoja[fila_encabezados]:
+    hoja[1][0].font = Font(bold=True, size=16)
+
+    for celda in hoja[17]:
         celda.fill = color_encabezado
         celda.font = fuente_encabezado
         celda.alignment = Alignment(horizontal='center')
-
-    hoja[1][0].font = Font(bold=True, size=16)
 
     for columna in hoja.columns:
         maximo = 0
@@ -752,10 +864,6 @@ def crear_admin():
         db.session.add(nuevo_admin)
         db.session.commit()
 
-
-# =====================================
-# EJECUTAR
-# =====================================
 
 # =====================================
 # CREAR BASE DE DATOS AL INICIAR
