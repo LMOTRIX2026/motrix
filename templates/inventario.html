@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -94,21 +94,13 @@
 
         .number {
             margin-top: 10px;
-            font-size: 27px;
+            font-size: 25px;
             font-weight: bold;
         }
 
-        .blue {
-            border-left: 6px solid #2563eb;
-        }
-
-        .green {
-            border-left: 6px solid #16a34a;
-        }
-
-        .orange {
-            border-left: 6px solid #f97316;
-        }
+        .blue { border-left: 6px solid #2563eb; }
+        .green { border-left: 6px solid #16a34a; }
+        .yellow { border-left: 6px solid #f59e0b; }
 
         .panel {
             padding: 25px;
@@ -119,6 +111,7 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 15px;
+            align-items: end;
         }
 
         label {
@@ -129,7 +122,8 @@
             margin-bottom: 6px;
         }
 
-        input {
+        input,
+        select {
             width: 100%;
             padding: 12px;
             border: 1px solid #d1d5db;
@@ -139,32 +133,28 @@
 
         .btn {
             border: none;
-            padding: 12px 18px;
+            padding: 10px 14px;
             border-radius: 10px;
             cursor: pointer;
             font-weight: bold;
             text-decoration: none;
             display: inline-block;
+            font-size: 13px;
         }
 
         .btn-primary {
             background: #2563eb;
             color: white;
-            margin-top: 18px;
         }
 
         .btn-edit {
             background: #f59e0b;
             color: white;
-            padding: 8px 12px;
-            font-size: 13px;
         }
 
         .btn-delete {
             background: #dc2626;
             color: white;
-            padding: 8px 12px;
-            font-size: 13px;
         }
 
         .table-header {
@@ -190,7 +180,7 @@
         }
 
         th, td {
-            padding: 14px;
+            padding: 13px;
             border-bottom: 1px solid #e5e7eb;
             text-align: left;
             font-size: 14px;
@@ -204,37 +194,20 @@
             font-weight: bold;
         }
 
-        .badge {
-            padding: 6px 10px;
-            border-radius: 999px;
-            font-weight: bold;
-            font-size: 12px;
-            display: inline-block;
-        }
-
         .stock-ok {
-            background: #dcfce7;
-            color: #166534;
+            color: #16a34a;
+            font-weight: bold;
         }
 
-        .stock-bajo {
-            background: #fee2e2;
-            color: #991b1b;
+        .stock-low {
+            color: #dc2626;
+            font-weight: bold;
         }
 
-        @media (max-width: 1000px) {
+        @media (max-width: 1200px) {
             .cards,
             .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .table-header {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .search-box {
-                max-width: 100%;
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
@@ -247,6 +220,20 @@
 
             .content {
                 margin-left: 0;
+            }
+
+            .cards,
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: 100%;
             }
 
             table {
@@ -266,6 +253,7 @@
         <a href="/">Dashboard</a>
         <a class="active" href="/inventario">Inventario</a>
         <a href="/ventas">Ventas</a>
+        <a href="/gastos">Gastos</a>
 
         {% if session.get('rol') == 'admin' %}
             <a href="/informes">Informes</a>
@@ -279,44 +267,39 @@
 
         <div class="topbar">
             <h1>Inventario</h1>
-            <p>Consulta y control de productos disponibles.</p>
+            <p>Consulta productos, stock disponible y valores proyectados del inventario.</p>
         </div>
 
-        {% if session.get('rol') == 'admin' %}
-
         <div class="cards">
-
             <div class="card blue">
-                <h3>Valor inventario a costo</h3>
-                <div class="number">$ {{ "{:,.0f}".format(total_inventario_costo) }}</div>
+                <h3>Inventario a costo</h3>
+                <div class="number">$ {{ "{:,.0f}".format(total_inventario_costo or 0) }}</div>
             </div>
 
             <div class="card green">
-                <h3>Valor inventario a venta</h3>
-                <div class="number">$ {{ "{:,.0f}".format(total_inventario_venta) }}</div>
+                <h3>Inventario a venta</h3>
+                <div class="number">$ {{ "{:,.0f}".format(total_inventario_venta or 0) }}</div>
             </div>
 
-            <div class="card orange">
+            <div class="card yellow">
                 <h3>Utilidad proyectada</h3>
-                <div class="number">$ {{ "{:,.0f}".format(utilidad_proyectada) }}</div>
+                <div class="number">$ {{ "{:,.0f}".format(utilidad_proyectada or 0) }}</div>
             </div>
-
         </div>
 
+        {% if session.get('rol') == 'admin' %}
         <div class="panel">
             <h2>Agregar producto</h2>
 
             <form action="/agregar_producto" method="POST">
-
                 <div class="form-grid">
-
                     <div>
                         <label>Referencia</label>
                         <input type="text" name="referencia" required>
                     </div>
 
                     <div>
-                        <label>Nombre</label>
+                        <label>Producto</label>
                         <input type="text" name="nombre" required>
                     </div>
 
@@ -341,27 +324,21 @@
                     </div>
 
                     <div>
-                        <label>Precio venta sugerido</label>
+                        <label>Precio venta</label>
                         <input type="number" name="precio_venta" min="0" required>
                     </div>
 
+                    <div>
+                        <button class="btn btn-primary" type="submit">Guardar producto</button>
+                    </div>
                 </div>
-
-                <button class="btn btn-primary" type="submit">Guardar producto</button>
-
             </form>
         </div>
-
         {% endif %}
 
         <div class="panel">
-
             <div class="table-header">
-                <div>
-                    <h2>Productos registrados</h2>
-                    <p style="margin: 0; color: #6b7280;">Los vendedores no visualizan precios de costo ni ganancias.</p>
-                </div>
-
+                <h2>Listado de productos</h2>
                 <input class="search-box" type="text" id="buscador" placeholder="Buscar producto..." onkeyup="buscarProducto()">
             </div>
 
@@ -373,15 +350,11 @@
                         <th>Marca</th>
                         <th>Categoría</th>
                         <th>Stock</th>
-
-                        {% if session.get('rol') == 'admin' %}
-                            <th>Compra</th>
-                        {% endif %}
-
+                        <th>Compra</th>
                         <th>Venta sugerida</th>
+                        <th>Ganancia unidad</th>
 
                         {% if session.get('rol') == 'admin' %}
-                            <th>Ganancia unidad</th>
                             <th>Acciones</th>
                         {% endif %}
                     </tr>
@@ -396,41 +369,31 @@
                         <td>{{ producto.categoria }}</td>
 
                         <td>
-                            {% if producto.stock <= 5 %}
-                                <span class="badge stock-bajo">Bajo: {{ producto.stock }}</span>
+                            {% if (producto.stock or 0) <= 5 %}
+                                <span class="stock-low">Bajo: {{ producto.stock }}</span>
                             {% else %}
-                                <span class="badge stock-ok">Disponible: {{ producto.stock }}</span>
+                                <span class="stock-ok">{{ producto.stock }}</span>
                             {% endif %}
                         </td>
 
-                        {% if session.get('rol') == 'admin' %}
-                            <td class="money">$ {{ "{:,.0f}".format(producto.precio_compra or 0) }}</td>
-                        {% endif %}
-
+                        <td class="money">$ {{ "{:,.0f}".format(producto.precio_compra or 0) }}</td>
                         <td class="money">$ {{ "{:,.0f}".format(producto.precio_venta or 0) }}</td>
+                        <td class="money">$ {{ "{:,.0f}".format((producto.precio_venta or 0) - (producto.precio_compra or 0)) }}</td>
 
                         {% if session.get('rol') == 'admin' %}
-                            <td class="money">$ {{ "{:,.0f}".format((producto.precio_venta or 0) - (producto.precio_compra or 0)) }}</td>
-
-                            <td>
-                                <a class="btn btn-edit" href="/editar_producto/{{ producto.id }}">Editar</a>
-
-                                <a class="btn btn-delete"
-                                   href="/eliminar_producto/{{ producto.id }}"
-                                   onclick="return confirm('¿Seguro que deseas eliminar este producto?')">
-                                   Eliminar
-                                </a>
-                            </td>
+                        <td>
+                            <a class="btn btn-edit" href="/editar_producto/{{ producto.id }}">Editar</a>
+                            <a class="btn btn-delete" href="/eliminar_producto/{{ producto.id }}" onclick="return confirm('¿Seguro que deseas eliminar este producto?')">Eliminar</a>
+                        </td>
                         {% endif %}
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="9">Todavía no hay productos registrados.</td>
+                        <td colspan="9">No hay productos registrados.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-
         </div>
 
     </div>
@@ -444,12 +407,7 @@
 
             for (let i = 1; i < filas.length; i++) {
                 let textoFila = filas[i].textContent.toLowerCase();
-
-                if (textoFila.includes(filtro)) {
-                    filas[i].style.display = "";
-                } else {
-                    filas[i].style.display = "none";
-                }
+                filas[i].style.display = textoFila.includes(filtro) ? "" : "none";
             }
         }
     </script>
